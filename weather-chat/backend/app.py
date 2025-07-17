@@ -23,6 +23,10 @@ def get_location_from_ip(ip):
     - ipapi will limit number of requests
     """
     try:
+        # For local testing, return a fixed location
+        if ip == "127.0.0.1":
+            return {"city": "Waterloo", "region": "Ontario", "country": "Canada"}
+        
         url = f"https://ipapi.co/{ip}/json/"
         response = requests.get(url, timeout=5) # in case ipapi is slow
         response.raise_for_status() # raise an error if request failed
@@ -45,8 +49,8 @@ def get_weather(location):
     try: 
         city = location.get("city")
 
-        if not city:
-            return "Weather information is not available for your location."
+        if not city or city == "Unknown":
+            return {}
         
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric"
         response = requests.get(url, timeout=5)
@@ -58,27 +62,40 @@ def get_weather(location):
     
 def build_prompt(user_message, location, weather_info):
     # Build the prompt for OpenAI API
-    weather_description = weather_info.get("weather", [{}])[0].get("description", "No weather data available")
-    temp = weather_info.get("main", {}).get("temp", "N/A")
     city = location.get("city", "your area")
     region = location.get("region", "")
     country = location.get("country", "")
 
     location_str = f"{city}, {region}, {country}" if region and country else city
 
-    prompt = (
-        f"The user asked: '{user_message}'. "
-        f"The current weather in {location_str} is {weather_description} with a temperature of {temp}°C. "
-        "Respond in a friendly, conversational way that incorporates the weather information."
-    )
+    if not weather_info or weather_info == {}:
+        # No weather data available
+        prompt = (
+            f"The user asked: '{user_message}'. "
+            f"I wasn't able to get current weather information for {location_str}. "
+            "Respond in a friendly, conversational way and apologize that you can't provide "
+            "current weather data, but offer to help in other ways or suggest they check a weather app."
+        )
+
+    else:
+        weather_description = weather_info.get("weather", [{}])[0].get("description", "No weather data available")
+        temp = weather_info.get("main", {}).get("temp", "N/A")
+        prompt = (
+            f"The user asked: '{user_message}'. "
+            f"The current weather in {location_str} is {weather_description} with a temperature of {temp}°C. "
+            "Respond in a friendly, conversational way that incorporates the weather information."
+        )
     return prompt
     
 def get_openai_response(prompt):
-    # Get a response from OpenAI API
+    '''# Get a response from OpenAI API
     """ Potential issues/improvements:
     - If the prompt is too long, it may exceed the token limit """
     try:
-        completion = openai.ChatCompletion.create(
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
+        
+        completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
         )
@@ -86,7 +103,10 @@ def get_openai_response(prompt):
     except Exception as e:
         print(f"Error getting response from OpenAI: {e}")
         return "Sorry, I couldn't process your request at the moment."
-        
+        '''
+    # Mock response for testing purposes
+    print(f"MOCK: Would send this prompt to OpenAI: {prompt[:100]}...")
+    return "Hi! I can see your request is working perfectly. The weather system is connected and ready. Once you add OpenAI credits, I'll give you real weather responses!"
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -95,11 +115,25 @@ def chat():
     user_message = data.get("message")
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
 
+    # Debugging logs
+    print(f"User message: {user_message}")
+    print(f"User IP: {user_ip}")
+
     location = get_location_from_ip(user_ip)
+    # Debugging logs
+    print(f"Location: {location}")
+
     weather_info = get_weather(location)
+    # Debugging logs
+    print(f"Weather info: {weather_info}")
 
     prompt = build_prompt(user_message, location, weather_info)
+    # Debugging logs
+    print(f"Prompt: {prompt}")
+
     response_text = get_openai_response(prompt)
+    # Debugging logs
+    print(f"Response: {response_text}")
 
     return jsonify({"response": response_text})
 

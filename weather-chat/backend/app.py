@@ -13,8 +13,8 @@ CORS(app, origins=[
     "http://localhost:5174", 
     "http://localhost:5173",
     "http://127.0.0.1:5174",
-    "http://127.0.0.1:5173"
-    "https://weather-chat-app.vercel.app"  # We'll update this with your actual domain
+    "http://127.0.0.1:5173",
+    "https://weather-chat-app.vercel.app"  # update this with actual domain
 ])
 
 # Retriecve API keys from environment variables
@@ -121,29 +121,32 @@ def chat():
     user_message = data.get("message")
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
 
-    # Debugging logs
+    '''# Debugging logs
     print(f"User message: {user_message}")
-    print(f"User IP: {user_ip}")
+    print(f"User IP: {user_ip}")'''
 
     location = get_location_from_ip(user_ip)
-    # Debugging logs
+    ''' # Debugging logs
     print(f"Location: {location}")
+    '''
 
     weather_info = get_weather(location)
-    # Debugging logs
-    print(f"Weather info: {weather_info}")
+    '''# Debugging logs
+    print(f"Weather info: {weather_info}")'''
 
     prompt = build_prompt(user_message, location, weather_info)
-    # Debugging logs
-    print(f"Prompt: {prompt}")
+    '''# Debugging logs
+    print(f"Prompt: {prompt}")'''
 
     response_text = get_openai_response(prompt)
-    # Debugging logs
-    print(f"Response: {response_text}")
+    '''# Debugging logs
+    print(f"Response: {response_text}")'''
 
     return jsonify({"response": response_text})
 
-
 if __name__ == "__main__":
+    app.run(debug=True, host='localhost', port=5000)
+
+'''if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)'''

@@ -100,16 +100,25 @@ const WeatherChat = () => {
     setLoading(true);
   
   try {
-    // Environment-aware API URL
+   /* // Environment-aware API URL
     const apiUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://weather-chat-backend.railway.app/chat'  // We'll update this later
-      : 'http://127.0.0.1:5000/chat';
-
-    const response = await fetch(apiUrl, {
+      ? 'https://weather-chat-backend.railway.app/chat'  // update with backend deployment later
+      : 'http://127.0.0.1:5000/chat';*/
+      const response = await fetch('http://127.0.0.1:5000/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: input })
     });
+
+    const data = await response.json();
+
+    setMessages(prev => [...prev, {
+      id: Date.now() + 1,
+      text: data.response,
+      sender: 'bot',
+      time: new Date().toLocaleTimeString()
+    }]);
+
     } catch (error) {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,

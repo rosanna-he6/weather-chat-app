@@ -12,7 +12,7 @@ const WeatherChat = () => {
     const initGoogle = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: '477050056429-alcrf17a610i3h4sn6uk7b7nbfloa0lm.apps.googleusercontent.com', 
+          client_id: '477050056429-alcrf17a610i3h4sn6uk7b7nbfloa0lm.apps.googleusercontent.com',
           callback: handleGoogleSignIn,
           auto_select: false,
           cancel_on_tap_outside: true
@@ -66,7 +66,7 @@ const WeatherChat = () => {
       // Add welcome message
       setMessages([{
         id: 1,
-        text: `Hi ${payload.name}! I'm your weather assistant. Ask me about the weather in your area!`,
+        text: `Hi ${payload.name}! I'm your weather assistant. Ask me about the weather today!`,
         sender: 'bot',
         time: new Date().toLocaleTimeString()
       }]);
@@ -100,7 +100,7 @@ const WeatherChat = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/chat', {
+      const response = await fetch('http://127.0.0.1:5000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input })
@@ -125,34 +125,82 @@ const WeatherChat = () => {
     setLoading(false);
   };
 
-  // Login screen
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-xl shadow-2xl text-center max-w-md w-full">
-          <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Cloud className="w-12 h-12 text-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">WeatherChat</h1>
-          <p className="text-gray-600 mb-8">
-            Get personalized weather information through natural conversation
-          </p>
+// Login screen
+if (!user) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Floating Clouds */}
+        <div className="absolute top-20 left-10 w-24 h-16 bg-white bg-opacity-20 rounded-full animate-pulse"></div>
+        <div className="absolute top-32 right-20 w-32 h-20 bg-white bg-opacity-15 rounded-full animate-bounce" style={{animationDelay: '1s', animationDuration: '3s'}}></div>
+        <div className="absolute top-64 left-1/4 w-20 h-12 bg-white bg-opacity-10 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
+        
+        {/* Animated Raindrops */}
+        <div className="absolute top-0 left-1/3 w-1 h-8 bg-blue-200 rounded-full animate-bounce" style={{animationDelay: '0.5s', animationDuration: '1s'}}></div>
+        <div className="absolute top-0 left-2/3 w-1 h-6 bg-blue-300 rounded-full animate-bounce" style={{animationDelay: '1.5s', animationDuration: '1.2s'}}></div>
+        <div className="absolute top-0 right-1/4 w-1 h-10 bg-blue-200 rounded-full animate-bounce" style={{animationDelay: '0.8s', animationDuration: '0.9s'}}></div>
+        
+        {/* Sun Rays */}
+        <div className="absolute top-16 right-16 w-2 h-16 bg-yellow-300 bg-opacity-30 transform rotate-45 animate-pulse"></div>
+        <div className="absolute top-20 right-12 w-2 h-12 bg-yellow-300 bg-opacity-40 transform rotate-90 animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-12 right-20 w-2 h-14 bg-yellow-300 bg-opacity-35 transform rotate-12 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+      </div>
+      
+      {/* Main Login Card */}
+      <div className="bg-white bg-opacity-95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl text-center max-w-md w-full relative z-10 border border-white border-opacity-20">
+        {/* Weather Icon Logo */}
+        <div className="relative mx-auto mb-6 w-24 h-24">
+          {/* Sun */}
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
           
-          {/* Google Sign-In Button */}
-          <div id="google-signin-btn" className="mb-4"></div>
+          {/* Cloud overlay */}
+          <div className="absolute bottom-2 left-2 w-16 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full opacity-90 animate-pulse"></div>
+          <div className="absolute bottom-3 right-1 w-12 h-8 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full opacity-80 animate-pulse" style={{animationDelay: '1s'}}></div>
           
-          <p className="text-sm text-gray-500 mt-4">
-            Sign in with your Google account to get started
-          </p>
-          
-          {/* Loading state for Google button */}
-          <div className="mt-4 text-xs text-gray-400">
-            {!window.google && "Loading Google Sign-In..."}
+          {/* Lightning bolt */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-yellow-200 text-xl animate-bounce" style={{animationDelay: '2s'}}>
+            ⚡
           </div>
         </div>
+        
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          WeatherChat
+        </h1>
+        <p className="text-gray-600 mb-8 text-lg">
+          Get personalized weather information wherever you are.
+        </p>
+        
+        {/* Google Sign-In Button Container */}
+        <div id="google-signin-btn" className="mb-6 flex justify-center"></div>
+        
+        <p className="text-sm text-gray-500 mt-4">
+          Sign in with your Google account to get started
+        </p>
+        
+        {/* Loading indicator */}
+        <div className="mt-4 text-xs text-gray-400">
+          {!window.google && (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <span className="ml-2">Loading Google Sign-In...</span>
+            </div>
+          )}
+        </div>
+        
+        {/* Weather Animation at Bottom */}
+        <div className="mt-6 flex justify-center space-x-4 text-2xl">
+          <span className="animate-bounce" style={{animationDelay: '0s'}}>🌤️</span>
+          <span className="animate-bounce" style={{animationDelay: '0.5s'}}>🌧️</span>
+          <span className="animate-bounce" style={{animationDelay: '1s'}}>⛈️</span>
+          <span className="animate-bounce" style={{animationDelay: '1.5s'}}>🌈</span>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // Chat screen
   return (

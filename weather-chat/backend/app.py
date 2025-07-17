@@ -9,7 +9,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:5174", 
+    "http://localhost:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5173"
+])
 
 # Retriecve API keys from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -88,7 +93,7 @@ def build_prompt(user_message, location, weather_info):
     return prompt
     
 def get_openai_response(prompt):
-    '''# Get a response from OpenAI API
+    # Get a response from OpenAI API
     """ Potential issues/improvements:
     - If the prompt is too long, it may exceed the token limit """
     try:
@@ -103,11 +108,11 @@ def get_openai_response(prompt):
     except Exception as e:
         print(f"Error getting response from OpenAI: {e}")
         return "Sorry, I couldn't process your request at the moment."
-        '''
-    # Mock response for testing purposes
+        
+''' # Mock response for testing purposes
     print(f"MOCK: Would send this prompt to OpenAI: {prompt[:100]}...")
     return "Hi! I can see your request is working perfectly. The weather system is connected and ready. Once you add OpenAI credits, I'll give you real weather responses!"
-
+'''
 @app.route('/chat', methods=['POST'])
 def chat():
     """Main endpoint: takes user message, retrieves location and weather info, and returns a response from OpenAI"""

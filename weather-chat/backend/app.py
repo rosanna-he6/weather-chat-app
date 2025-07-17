@@ -14,6 +14,7 @@ CORS(app, origins=[
     "http://localhost:5173",
     "http://127.0.0.1:5174",
     "http://127.0.0.1:5173"
+    "https://weather-chat-app.vercel.app"  # We'll update this with your actual domain
 ])
 
 # Retriecve API keys from environment variables
@@ -144,4 +145,5 @@ def chat():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
